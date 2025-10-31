@@ -144,9 +144,7 @@ def display_sample_questions():
         "What districts in Punjab have IMD weather coverage?",
         "Show me the top 5 crops in the Agmark system",
         "How many districts have more than 20 mandis?",
-        "What are the Hindi names of vegetable crops?",
-        "Which districts neighbor Delhi?",
-        "List all blocks in Andhra Pradesh"
+        "Which districts neighbor Delhi?"
     ]
     
     for i, question in enumerate(sample_questions):
@@ -187,7 +185,6 @@ def main():
         st.markdown("### 📈 System Stats")
         st.metric("Total Records", "11,330")
         st.metric("Datasets", "6")
-        st.metric("States Covered", "36")
     
     # Main content
     col1, col2 = st.columns([2, 1])
@@ -278,8 +275,7 @@ def main():
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #7f8c8d; font-size: 0.9rem;">
-        Project Samarth - Built for Government Data Challenge<br>
-        Powered by Gemini 2.5 Flash
+        Project Samarth - Built for Government Data Challenge
     </div>
     """, unsafe_allow_html=True)
 
