@@ -86,7 +86,9 @@ def load_pipeline():
                 st.session_state.pipeline = SamarthPipeline(api_key)
                 st.success("✅ System ready!")
             except Exception as e:
-                st.error(f"❌ Error: {str(e)}")
+                st.error(f"❌ Error initializing pipeline: {str(e)}")
+                import traceback
+                st.code(traceback.format_exc())
                 st.stop()
 
 def display_datasets_info():

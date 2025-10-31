@@ -52,8 +52,18 @@ class GeminiClient:
             f.write(prompt)
         
         # Make LLM call
-        response = self.model.generate_content(prompt)
-        response_text = response.text
+        try:
+            response = self.model.generate_content(prompt)
+            
+            # Handle response safely
+            if hasattr(response, 'text') and response.text:
+                response_text = response.text
+            elif hasattr(response, 'parts') and response.parts:
+                response_text = response.parts[0].text
+            else:
+                response_text = str(response)
+        except Exception as e:
+            response_text = f"Error generating content: {str(e)}"
         
         # Log output
         output_log = {
