@@ -71,9 +71,14 @@ def set_question_input(question):
 def load_pipeline():
     """Load the pipeline"""
     if st.session_state.pipeline is None:
-        api_key = os.getenv('GEMINI_API_KEY')
+        # Try Streamlit secrets first (for cloud deployment), then environment variable (for local)
+        try:
+            api_key = st.secrets["GEMINI_API_KEY"]
+        except:
+            api_key = os.getenv('GEMINI_API_KEY')
+        
         if not api_key:
-            st.error("❌ GEMINI_API_KEY not found in .env file")
+            st.error("❌ GEMINI_API_KEY not configured. Please set it in Streamlit Cloud secrets or .env file")
             st.stop()
         
         with st.spinner("Loading agricultural data..."):
