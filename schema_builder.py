@@ -5,7 +5,7 @@ Builds minimal schema context for LLM prompts
 
 import pandas as pd
 from typing import Dict, List
-from data_loader import AgriculturalDataLoader
+from .data_loader import AgriculturalDataLoader
 
 class SchemaBuilder:
     def __init__(self):

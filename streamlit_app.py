@@ -6,8 +6,8 @@ Clean interface for agricultural Q&A system
 import streamlit as st
 import os
 from dotenv import load_dotenv
-from pipeline import SamarthPipeline
-from data_loader import AgriculturalDataLoader
+from project_samarth.pipeline import SamarthPipeline
+from project_samarth.data_loader import AgriculturalDataLoader
 
 # Load environment
 load_dotenv()

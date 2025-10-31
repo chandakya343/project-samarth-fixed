@@ -5,7 +5,7 @@ Query Executor - Deterministic code execution and evidence building
 import pandas as pd
 import json
 from typing import Dict, Any, List
-from data_loader import AgriculturalDataLoader
+from .data_loader import AgriculturalDataLoader
 
 class QueryExecutor:
     def __init__(self):

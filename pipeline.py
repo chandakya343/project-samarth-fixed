@@ -6,9 +6,9 @@ Orchestrates the 2-LLM call architecture
 import json
 from datetime import datetime
 from typing import Dict, Any
-from query_generator_gemini import QueryGeneratorGemini
-from executor import QueryExecutor
-from answer_synthesizer import AnswerSynthesizer
+from .query_generator_gemini import QueryGeneratorGemini
+from .executor import QueryExecutor
+from .answer_synthesizer import AnswerSynthesizer
 
 class SamarthPipeline:
     def __init__(self, gemini_api_key: str):

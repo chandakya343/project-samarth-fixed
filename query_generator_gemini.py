@@ -5,8 +5,8 @@ LLM Call #1: Understanding + Query Generation
 
 import re
 from typing import Dict, Any
-from gemini_client import GeminiClient
-from schema_builder import SchemaBuilder
+from .gemini_client import GeminiClient
+from .schema_builder import SchemaBuilder
 
 class QueryGeneratorGemini:
     def __init__(self, api_key: str):
