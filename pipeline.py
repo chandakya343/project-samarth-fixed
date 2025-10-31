@@ -37,14 +37,31 @@ class SamarthPipeline:
         # Step 1: Query Generation (LLM Call #1)
         print("Step 1: Generating pandas query...")
         query_result = self.query_generator.generate_query(question)
+        
+        # Check for errors in query generation
+        if 'error' in query_result or query_result.get('query_code') is None:
+            error_msg = query_result.get('error', 'Failed to generate query')
+            trace['steps'].append({
+                'step': 1,
+                'name': 'Query Generation (LLM Call #1)',
+                'error': error_msg
+            })
+            trace['final_answer'] = f"Error generating query: {error_msg}"
+            self._save_trace(trace)
+            return {
+                'success': False,
+                'error': error_msg,
+                'trace': trace
+            }
+        
         trace['steps'].append({
             'step': 1,
             'name': 'Query Generation (LLM Call #1)',
-            'log_id': query_result['log_id'],
-            'query_code': query_result['query_code'],
-            'relevant_datasets': query_result['relevant_datasets']
+            'log_id': query_result.get('log_id', 'unknown'),
+            'query_code': query_result.get('query_code', ''),
+            'relevant_datasets': query_result.get('relevant_datasets', [])
         })
-        print(f"✓ Generated query (log: {query_result['log_id']})")
+        print(f"✓ Generated query (log: {query_result.get('log_id', 'unknown')})")
         
         # Step 2: Query Execution (Deterministic)
         print("Step 2: Executing query...")
@@ -117,11 +134,17 @@ class SamarthPipeline:
     
     def _save_trace(self, trace: Dict[str, Any]):
         """Save complete execution trace"""
-        timestamp = trace['timestamp'].replace(':', '-')
-        filename = f"llm_logs/TRACE_{timestamp}.json"
-        
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(trace, f, indent=2, ensure_ascii=False)
-        
-        print(f"✓ Trace saved: {filename}")
+        try:
+            import os
+            os.makedirs('llm_logs', exist_ok=True)
+            
+            timestamp = trace['timestamp'].replace(':', '-')
+            filename = f"llm_logs/TRACE_{timestamp}.json"
+            
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(trace, f, indent=2, ensure_ascii=False)
+            
+            print(f"✓ Trace saved: {filename}")
+        except Exception as e:
+            print(f"Warning: Could not save trace: {str(e)}")
 

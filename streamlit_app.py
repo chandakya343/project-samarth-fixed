@@ -216,21 +216,31 @@ def main():
                 try:
                     result = st.session_state.pipeline.process_question(user_question)
                     
-                    if result['success']:
+                    if result is None:
+                        st.error("❌ Error: Pipeline returned None. Please check your API key and internet connection.")
+                    elif result.get('success'):
                         # Prepend to history
                         st.session_state.history.insert(0, {
                             'question': user_question,
-                            'answer': result['answer'],
-                            'citations': result['citations']
+                            'answer': result.get('answer', 'No answer generated'),
+                            'citations': result.get('citations', [])
                         })
                         # Rerun to display history and prevent re-submission
                         st.rerun()
                         
                     else:
-                        st.error(f"❌ Error: {result.get('error', 'Unknown error')}")
+                        error_msg = result.get('error', 'Unknown error')
+                        st.error(f"❌ Error: {error_msg}")
+                        
+                        # Show more details in an expander for debugging
+                        with st.expander("📋 Debug Information"):
+                            st.json(result)
                         
                 except Exception as e:
                     st.error(f"❌ Unexpected error: {str(e)}")
+                    import traceback
+                    with st.expander("📋 Full Error Details"):
+                        st.code(traceback.format_exc())
 
         # Display latest answer if it exists in history
         if st.session_state.history:

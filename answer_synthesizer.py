@@ -24,18 +24,43 @@ class AnswerSynthesizer:
         Returns:
             Dict with answer, citations, log_id
         """
-        # Build XML prompt
-        prompt = self._build_synthesis_prompt(question, executed_code, evidence, citations)
-        
-        # Call LLM
-        response = self.gemini.call_llm(prompt, 'answer_synthesis')
-        
-        return {
-            'answer': response['response'],
-            'citations': citations,
-            'log_id': response['log_id'],
-            'raw_response': response['response']
-        }
+        try:
+            # Build XML prompt
+            prompt = self._build_synthesis_prompt(question, executed_code, evidence, citations)
+            
+            # Call LLM
+            response = self.gemini.call_llm(prompt, 'answer_synthesis')
+            
+            # Validate response
+            if response is None:
+                return {
+                    'answer': "Error: Failed to synthesize answer (API returned None)",
+                    'citations': citations,
+                    'log_id': 'error',
+                    'raw_response': ''
+                }
+            
+            if 'response' not in response:
+                return {
+                    'answer': "Error: Failed to synthesize answer (invalid response format)",
+                    'citations': citations,
+                    'log_id': response.get('log_id', 'error'),
+                    'raw_response': ''
+                }
+            
+            return {
+                'answer': response.get('response', 'Error: Empty response'),
+                'citations': citations,
+                'log_id': response.get('log_id', 'unknown'),
+                'raw_response': response.get('response', '')
+            }
+        except Exception as e:
+            return {
+                'answer': f"Error synthesizing answer: {str(e)}",
+                'citations': citations,
+                'log_id': 'error',
+                'raw_response': ''
+            }
     
     def _build_synthesis_prompt(
         self, 

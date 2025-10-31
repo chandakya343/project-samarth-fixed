@@ -44,26 +44,37 @@ class GeminiClient:
             'model': 'gemini-1.5-flash'
         }
         
-        with open(f'llm_logs/{log_id}_INPUT.json', 'w', encoding='utf-8') as f:
-            json.dump(input_log, f, indent=2, ensure_ascii=False)
-        
-        # Also save raw prompt
-        with open(f'llm_logs/{log_id}_INPUT_RAW.txt', 'w', encoding='utf-8') as f:
-            f.write(prompt)
+        try:
+            with open(f'llm_logs/{log_id}_INPUT.json', 'w', encoding='utf-8') as f:
+                json.dump(input_log, f, indent=2, ensure_ascii=False)
+            
+            # Also save raw prompt
+            with open(f'llm_logs/{log_id}_INPUT_RAW.txt', 'w', encoding='utf-8') as f:
+                f.write(prompt)
+        except Exception as e:
+            print(f"Warning: Could not save input logs: {str(e)}")
         
         # Make LLM call
         try:
             response = self.model.generate_content(prompt)
             
             # Handle response safely
-            if hasattr(response, 'text') and response.text:
+            if response is None:
+                response_text = "Error: API returned None response"
+            elif hasattr(response, 'text') and response.text:
                 response_text = response.text
-            elif hasattr(response, 'parts') and response.parts:
+            elif hasattr(response, 'parts') and response.parts and len(response.parts) > 0:
                 response_text = response.parts[0].text
+            elif hasattr(response, 'candidates') and response.candidates and len(response.candidates) > 0:
+                candidate = response.candidates[0]
+                if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
+                    response_text = candidate.content.parts[0].text
+                else:
+                    response_text = f"Error: Unable to extract text from response structure: {str(response)}"
             else:
-                response_text = str(response)
+                response_text = f"Error: Unexpected response format: {str(response)}"
         except Exception as e:
-            response_text = f"Error generating content: {str(e)}"
+            response_text = f"Error generating content: {str(e)}\nFull exception: {type(e).__name__}"
         
         # Log output
         output_log = {
@@ -73,12 +84,15 @@ class GeminiClient:
             'model': 'gemini-1.5-flash'
         }
         
-        with open(f'llm_logs/{log_id}_OUTPUT.json', 'w', encoding='utf-8') as f:
-            json.dump(output_log, f, indent=2, ensure_ascii=False)
-        
-        # Also save raw response
-        with open(f'llm_logs/{log_id}_OUTPUT_RAW.txt', 'w', encoding='utf-8') as f:
-            f.write(response_text)
+        try:
+            with open(f'llm_logs/{log_id}_OUTPUT.json', 'w', encoding='utf-8') as f:
+                json.dump(output_log, f, indent=2, ensure_ascii=False)
+            
+            # Also save raw response
+            with open(f'llm_logs/{log_id}_OUTPUT_RAW.txt', 'w', encoding='utf-8') as f:
+                f.write(response_text)
+        except Exception as e:
+            print(f"Warning: Could not save output logs: {str(e)}")
         
         return {
             'response': response_text,

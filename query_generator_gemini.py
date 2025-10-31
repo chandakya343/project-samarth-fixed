@@ -21,27 +21,46 @@ class QueryGeneratorGemini:
         Returns:
             Dict with query_code, relevant_datasets, log_id
         """
-        # Step 1: Determine relevant datasets
-        relevant_datasets = self.schema_builder.get_relevant_datasets(question)
-        
-        # Step 2: Build schema XML for those datasets
-        schema_xml = self.schema_builder.build_schema_xml(relevant_datasets)
-        
-        # Step 3: Build full XML prompt
-        prompt = self._build_query_generation_prompt(question, schema_xml)
-        
-        # Step 4: Call LLM
-        response = self.gemini.call_llm(prompt, 'query_generation')
-        
-        # Step 5: Extract pandas code from response
-        query_code = self._extract_pandas_code(response['response'])
-        
-        return {
-            'query_code': query_code,
-            'relevant_datasets': relevant_datasets,
-            'log_id': response['log_id'],
-            'raw_response': response['response']
-        }
+        try:
+            # Step 1: Determine relevant datasets
+            relevant_datasets = self.schema_builder.get_relevant_datasets(question)
+            
+            # Step 2: Build schema XML for those datasets
+            schema_xml = self.schema_builder.build_schema_xml(relevant_datasets)
+            
+            # Step 3: Build full XML prompt
+            prompt = self._build_query_generation_prompt(question, schema_xml)
+            
+            # Step 4: Call LLM
+            response = self.gemini.call_llm(prompt, 'query_generation')
+            
+            # Step 5: Validate response
+            if response is None:
+                raise ValueError("LLM returned None response")
+            
+            if 'response' not in response:
+                raise ValueError("LLM response missing 'response' key")
+            
+            # Step 6: Extract pandas code from response
+            query_code = self._extract_pandas_code(response['response'])
+            
+            if not query_code or query_code.strip() == "":
+                raise ValueError("Failed to extract pandas code from LLM response")
+            
+            return {
+                'query_code': query_code,
+                'relevant_datasets': relevant_datasets,
+                'log_id': response.get('log_id', 'unknown'),
+                'raw_response': response.get('response', '')
+            }
+        except Exception as e:
+            return {
+                'query_code': None,
+                'relevant_datasets': [],
+                'log_id': 'error',
+                'error': str(e),
+                'raw_response': ''
+            }
     
     def _build_query_generation_prompt(self, question: str, schema_xml: str) -> str:
         """Build XML-structured prompt for query generation"""
