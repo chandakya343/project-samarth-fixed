@@ -5,7 +5,7 @@ LLM Call #2: Context Manager + Answer Synthesis
 
 import json
 from typing import Dict, Any, List
-from .gemini_client import GeminiClient
+from gemini_client import GeminiClient
 
 class AnswerSynthesizer:
     def __init__(self, api_key: str):
