@@ -1,0 +1,47 @@
+================================================================================
+PROMPT LOCATIONS - PROJECT SAMARTH
+================================================================================
+
+The 2 LLM prompts (non-deterministic parts you need to review):
+
+--------------------------------------------------------------------------------
+PROMPT #1: QUERY GENERATION
+--------------------------------------------------------------------------------
+File: query_generator_gemini.py
+Method: _build_query_generation_prompt()
+Lines: 40-65 (approximately)
+
+This is where the system asks Gemini to convert the user's question into 
+pandas code. The prompt includes:
+- <SYSTEM> role
+- <SCHEMA> with relevant datasets
+- <QUESTION> from user
+- <CONSTRAINTS> for code generation
+- <OUTPUT_FORMAT> expecting <PANDAS_CODE> tags
+
+--------------------------------------------------------------------------------
+PROMPT #2: ANSWER SYNTHESIS
+--------------------------------------------------------------------------------
+File: answer_synthesizer.py
+Method: _build_synthesis_prompt()
+Lines: 35-80 (approximately)
+
+This is where the system asks Gemini to reason over the query results and
+generate a grounded answer. The prompt includes:
+- <SYSTEM> role
+- <QUESTION> from user
+- <EXECUTED_CODE> that was run
+- <EVIDENCE> JSON with query results
+- <CITATIONS> XML with source information
+- <INSTRUCTIONS> for reasoning
+- <OUTPUT_FORMAT> for answer structure
+
+================================================================================
+
+To see the EXACT prompts being sent to Gemini, run the system and check:
+  llm_logs/query_generation_*_INPUT_RAW.txt
+  llm_logs/answer_synthesis_*_INPUT_RAW.txt
+
+These files contain the raw text sent to Gemini with all XML tags and data.
+
+================================================================================
