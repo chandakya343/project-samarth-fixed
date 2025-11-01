@@ -144,7 +144,7 @@ def display_sample_questions():
         "What districts in Punjab have IMD weather coverage?",
         "Show me the top 5 crops in the Agmark system",
         "How many districts have more than 20 mandis?",
-        "Which districts neighbor Delhi?"
+        "Which districts neighbor Central Delhi?"
     ]
     
     for i, question in enumerate(sample_questions):
